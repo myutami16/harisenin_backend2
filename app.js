@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
-require("dotenv").config();
+const { getAll, getById } = require("./controllers/movieController");
 
 app.use(express.json());
 
-// TODO: Tambahkan route di sini nanti
+// Routes
+app.get("/movies", getAll);
+app.get("/movie/:id", getById);
 
 module.exports = app;
