@@ -35,6 +35,43 @@ const getMovieById = async (id) => {
 	}
 };
 
+const addMovie = async ({
+	title,
+	description,
+	duration,
+	release_date,
+	genre_id,
+	rating,
+}) => {
+	try {
+		const query =
+			"INSERT INTO movie (title, description, duration, release_date, genre_id, rating) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
+		const values = [
+			title,
+			description,
+			duration,
+			release_date,
+			genre_id,
+			rating,
+		];
+
+		const result = await pool.query(query, values);
+
+		if (result.rows.length > 0) {
+			return {
+				success: true,
+				message: "Successfully added the movie to the database",
+				data: result.rows[0],
+			};
+		}
+	} catch (error) {
+		return {
+			success: false,
+			message: `Failed to add movie: ${error.message}`,
+		};
+	}
+};
+
 // Controller
 const getAll = async (req, res) => {
 	try {
@@ -55,9 +92,45 @@ const getById = async (req, res) => {
 	}
 };
 
+const postMovie = async (req, res) => {
+	try {
+		const { title, description, duration, release_date, genre_id, rating } =
+			req.body;
+
+		if (!title || !description || !duration || !release_date || !genre_id) {
+			return res.status(400).json({
+				success: false,
+				message: "Missing required fields",
+			});
+		}
+
+		const result = await addMovie({
+			title,
+			description,
+			duration,
+			release_date,
+			genre_id,
+			rating,
+		});
+
+		if (result.success) {
+			return res.status(201).json(result);
+		} else {
+			return res.status(500).json(result);
+		}
+	} catch (err) {
+		return res.status(500).json({
+			success: false,
+			message: `Server error: ${err.message}`,
+		});
+	}
+};
+
 module.exports = {
 	getAllMovies,
 	getMovieById,
+	addMovie,
 	getAll,
 	getById,
+	postMovie,
 };
