@@ -33,8 +33,10 @@ Body:
   "title": "Updated Title"
   }
 
+
 #GET
 /api/movie/:id — Hapus movie by ID
+
 
 
 ##Setup
